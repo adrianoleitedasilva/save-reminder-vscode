@@ -1,4 +1,4 @@
-# save-reminder README
+# Save Reminder VSCode
 
 This is the README for your extension "save-reminder". After writing up a brief description, we recommend including the following sections.
 
