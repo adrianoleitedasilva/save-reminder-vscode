@@ -1,26 +1,36 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    // Função que será executada a cada 10 minutos
+    const remindToSave = () => {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const document = editor.document;
+            if (document.isDirty) {
+                // Exibe uma mensagem com as opções "Sim" e "Não"
+                vscode.window.showWarningMessage('Você tem alterações não salvas! Deseja salvar agora?', 'Sim', 'Não')
+                    .then(selection => {
+                        if (selection === 'Sim') {
+                            // Se o usuário escolher "Sim", salva o documento
+                            document.save().then(() => {
+                                vscode.window.showInformationMessage('Arquivo salvo com sucesso!');
+                            });
+                        } else {
+                            // Se o usuário escolher "Não", não faz nada
+                            vscode.window.showInformationMessage('Arquivo não salvo.');
+                        }
+                    });
+            }
+        }
+    };
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "save-reminder" is now active!');
+    // Configura o intervalo de 10 minutos (600000 milissegundos)
+    const interval = setInterval(remindToSave, 600000);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('save-reminder.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from save-reminder!');
-	});
-
-	context.subscriptions.push(disposable);
+    // Limpa o intervalo quando a extensão é desativada
+    context.subscriptions.push({ dispose: () => clearInterval(interval) });
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+    // Aqui você pode adicionar código para limpar recursos quando a extensão for desativada
+}
